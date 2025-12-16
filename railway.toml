@@ -1,0 +1,6 @@
+[build]
+root = "backend"
+command = "npm install"
+
+[deploy]
+startCommand = "node server.js"
