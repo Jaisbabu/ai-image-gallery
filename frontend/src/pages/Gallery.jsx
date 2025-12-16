@@ -123,7 +123,8 @@ useEffect(() => {
 
 
   /* ------------------ AUTO REFRESH ------------------ */
-  useEffect(() => {
+
+useEffect(() => {
     if (searchMode) return;
 
     const shouldPoll = images.some(
@@ -149,6 +150,35 @@ useEffect(() => {
       }
     };
   }, [images, searchMode, currentPage]);
+
+
+
+  // useEffect(() => {
+  //   if (searchMode) return;
+
+  //   const shouldPoll = images.some(
+  //     img => img?.metadata?.ai_processing_status === 'processing'
+  //   );
+
+  //   if (!shouldPoll) {
+  //     if (pollingRef.current) {
+  //       clearInterval(pollingRef.current);
+  //       pollingRef.current = null;
+  //     }
+  //     return;
+  //   }
+
+  //   if (!pollingRef.current) {
+  //     pollingRef.current = setInterval(() => loadImages(currentPage), 4000);
+  //   }
+
+  //   return () => {
+  //     if (pollingRef.current) {
+  //       clearInterval(pollingRef.current);
+  //       pollingRef.current = null;
+  //     }
+  //   };
+  // }, [images, searchMode, currentPage]);
 
 
   /* ------------------ SEARCH HANDLERS ------------------ */
