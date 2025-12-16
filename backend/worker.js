@@ -13,10 +13,6 @@ console.log('🧠 AI Worker started and listening for jobs...');
 imageProcessingQueue.process(1, async (job) => {
   const { imageId, imageUrl } = job.data;
 
-// const res = await fetch(imageUrl);
-// if (!res.ok) throw new Error('Failed to fetch image');
-// const imageBuffer = Buffer.from(await res.arrayBuffer());
-
 
   console.log(`🔄 Processing image ${imageId}`);
 
@@ -57,8 +53,14 @@ if (!imageBuffer) {
     return true;
 
   } catch (err) {
-    console.error(`❌ AI failed for image ${imageId}:`, err.message);
+  console.error(`❌ AI failed for image ${imageId}:`, err.message);
 
+  // ⛔ NON-RETRYABLE errors → mark failed and STOP
+  if (
+    err.message.includes('404') ||
+    err.message.includes('400') ||
+    err.message.includes('Failed to download image')
+  ) {
     await supabaseAdmin
       .from('image_metadata')
       .update({
@@ -67,8 +69,15 @@ if (!imageBuffer) {
       })
       .eq('image_id', imageId);
 
-    throw err;
+    console.warn(`🛑 Permanent failure for image ${imageId}. Job will NOT retry.`);
+    return false; // stop job permanently
   }
+
+  // 🔁 RETRYABLE → DO NOT update DB
+  throw err;
+}
+
+
 });
 
 
