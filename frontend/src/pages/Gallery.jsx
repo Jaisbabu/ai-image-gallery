@@ -49,33 +49,38 @@ const Gallery = () => {
 
   /* ------------------ SEARCH EFFECT ------------------ */
 
-
- useEffect(() => {
+useEffect(() => {
   if (searchAbortRef.current) {
     searchAbortRef.current.abort();
   }
 
   const controller = new AbortController();
-  searchAbortRef.current = controller; 
-
-
+  searchAbortRef.current = controller;
 
   const run = async () => {
-        // 🚫 These modes are handled by their own handlers
+    // 🚫 These modes are handled elsewhere
     if (searchMode === 'similar' || searchMode === 'color') {
       setLoading(false);
       return;
     }
 
+    // 🚫 Strict mode needs at least 3 chars
     if (searchMode === 'strict' && searchQuery.length < 3) {
-    setLoading(false);
-  return;
-}
+      setLoading(false);
+      return;
+    }
+
+    // 🚫 Any search needs at least 2 chars
+    if (searchMode && searchQuery.length < 2) {
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
+
       // 🖼️ GALLERY MODE
       if (!searchMode) {
-        setLoading(true);
-
         const result = await api.getImages(
           currentPage,
           20,
@@ -87,21 +92,7 @@ const Gallery = () => {
         return;
       }
 
-      // 🛑 INVALID SEARCH → do nothing
-     
-      if (searchQuery.length < 2) {
-  setLoading(false);
-  return;
-}
-     
-     
-      // if (searchQuery.length < 2) {
-      //   return;
-      // }
-
       // 🔍 SEARCH MODE
-      setLoading(true);
-
       if (searchMode === 'loose' || searchMode === 'strict') {
         const result = await api.searchByText(
           searchQuery,
@@ -115,27 +106,10 @@ const Gallery = () => {
         setImages(result.images || []);
         setPagination(result.pagination || null);
       }
-
-
-      } catch (err) {
-  // Expected cases → do nothing
-  if (
-    err.name === 'AbortError' ||
-    err.message?.includes('400')
-  ) {
-    return;
-  }
-
-  // Real failures only
-  toast.error('Search failed');
-}
-
-
-    // } 
-    // catch (err) {
-    //   if (err.name !== 'AbortError') {
-    //     toast.error('Search failed');
-    //   }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        toast.error('Search failed');
+      }
     } finally {
       if (!controller.signal.aborted) {
         setLoading(false);
@@ -146,6 +120,7 @@ const Gallery = () => {
   run();
   return () => controller.abort();
 }, [searchMode, searchQuery, currentPage]);
+
 
   /* ------------------ AUTO REFRESH ------------------ */
   useEffect(() => {
@@ -347,48 +322,6 @@ useEffect(() => {
 };
 
 
-
-
- //   const renderEmptyState = () => {
-//   if (searchMode === 'similar') {
-//     return (
-//       <div className="text-center py-24 text-purple-300">
-//         No similar images found for this image.
-//       </div>
-//     );
-//   }
-
-//   if (searchMode === 'color') {
-//     return (
-//       <div className="text-center py-24 text-purple-300">
-//         No images found with this color.
-//       </div>
-//     );
-//   }
-
-//   if (searchMode === 'loose' || searchMode === 'strict') {
-//     return (
-//       <div className="text-center py-24 text-purple-300">
-//         No matching images found.
-//       </div>
-//     );
-//   }
-
-//   // Default gallery empty
-//   return (
-//     <div className="flex justify-center py-24">
-//       <div className="text-center max-w-sm w-full bg-white/5 border border-white/10 rounded-2xl p-8">
-//         <h3 className="text-xl font-semibold text-white mb-2">
-//           No images yet
-//         </h3>
-//         <p className="text-purple-200 text-sm">
-//           Upload your first images to generate AI tags, colors,
-//           and searchable descriptions.
-//         </p>
-//       </div>
-//     </div>
-//   );
-// };
 
 
   /* ------------------ RENDER ------------------ */

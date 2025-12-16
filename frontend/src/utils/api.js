@@ -1,7 +1,10 @@
 import { getAuthHeaders } from './supabase';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('VITE_API_URL is not defined');
+}
 
 class ApiService {
   /**
@@ -117,7 +120,6 @@ class ApiService {
     return response.json();
   }
 
-
 async searchByText(query, page = 1, limit = 20, options = {}) {
   const headers = await getAuthHeaders();
   const mode = options.mode || 'strict';
@@ -138,8 +140,9 @@ async searchByText(query, page = 1, limit = 20, options = {}) {
     return { images: [], pagination: null };
   }
 
+  // Any other non-ok → empty result (not a failure)
   if (!response.ok) {
-    throw new Error(`Search failed (${response.status})`);
+    return { images: [], pagination: null };
   }
 
   return response.json();
