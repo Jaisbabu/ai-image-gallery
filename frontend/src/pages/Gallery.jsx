@@ -61,6 +61,12 @@ const Gallery = () => {
 
 
   const run = async () => {
+        // 🚫 These modes are handled by their own handlers
+    if (searchMode === 'similar' || searchMode === 'color') {
+      setLoading(false);
+      return;
+    }
+
     if (searchMode === 'strict' && searchQuery.length < 3) {
     setLoading(false);
   return;
@@ -82,9 +88,16 @@ const Gallery = () => {
       }
 
       // 🛑 INVALID SEARCH → do nothing
+     
       if (searchQuery.length < 2) {
-        return;
-      }
+  setLoading(false);
+  return;
+}
+     
+     
+      // if (searchQuery.length < 2) {
+      //   return;
+      // }
 
       // 🔍 SEARCH MODE
       setLoading(true);
@@ -103,10 +116,26 @@ const Gallery = () => {
         setPagination(result.pagination || null);
       }
 
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        toast.error('Search failed');
-      }
+
+      } catch (err) {
+  // Expected cases → do nothing
+  if (
+    err.name === 'AbortError' ||
+    err.message?.includes('400')
+  ) {
+    return;
+  }
+
+  // Real failures only
+  toast.error('Search failed');
+}
+
+
+    // } 
+    // catch (err) {
+    //   if (err.name !== 'AbortError') {
+    //     toast.error('Search failed');
+    //   }
     } finally {
       if (!controller.signal.aborted) {
         setLoading(false);
