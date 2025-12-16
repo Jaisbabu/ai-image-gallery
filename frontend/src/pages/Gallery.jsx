@@ -125,60 +125,43 @@ useEffect(() => {
   /* ------------------ AUTO REFRESH ------------------ */
 
 useEffect(() => {
-    if (searchMode) return;
+  if (searchMode) return;
 
-    const shouldPoll = images.some(
-      img => img?.metadata?.ai_processing_status === 'processing'
-    );
+  const shouldPoll = images.some(
+    img =>
+      img?.metadata?.ai_processing_status === 'processing' ||
+      img?.metadata?.ai_processing_status === 'pending'
+  );
 
-    if (!shouldPoll) {
+  if (!shouldPoll) {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    return;
+  }
+
+  if (!pollingRef.current) {
+    pollingRef.current = setInterval(() => {
+      loadImages(currentPage);
+    }, 4000);
+
+    // 🔒 Safety stop after 30s (prevents stuck UI)
+    setTimeout(() => {
       if (pollingRef.current) {
         clearInterval(pollingRef.current);
         pollingRef.current = null;
       }
-      return;
+    }, 30000);
+  }
+
+  return () => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
     }
-
-    if (!pollingRef.current) {
-      pollingRef.current = setInterval(() => loadImages(currentPage), 4000);
-    }
-
-    return () => {
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-      }
-    };
-  }, [images, searchMode, currentPage]);
-
-
-
-  // useEffect(() => {
-  //   if (searchMode) return;
-
-  //   const shouldPoll = images.some(
-  //     img => img?.metadata?.ai_processing_status === 'processing'
-  //   );
-
-  //   if (!shouldPoll) {
-  //     if (pollingRef.current) {
-  //       clearInterval(pollingRef.current);
-  //       pollingRef.current = null;
-  //     }
-  //     return;
-  //   }
-
-  //   if (!pollingRef.current) {
-  //     pollingRef.current = setInterval(() => loadImages(currentPage), 4000);
-  //   }
-
-  //   return () => {
-  //     if (pollingRef.current) {
-  //       clearInterval(pollingRef.current);
-  //       pollingRef.current = null;
-  //     }
-  //   };
-  // }, [images, searchMode, currentPage]);
+  };
+}, [images, searchMode, currentPage]);
 
 
   /* ------------------ SEARCH HANDLERS ------------------ */
@@ -264,14 +247,14 @@ useEffect(() => {
     setSelectedIndex(null);
   };
 
-  const handleUploadComplete = () => {
-    setShowUpload(false);
-    setImages([]);
-    setSearchMode(null);
-    setSearchQuery('');
-    setCurrentPage(1);
-    loadImages(1);
-  };
+const handleUploadComplete = async () => {
+  setShowUpload(false);
+  setSearchMode(null);
+  setSearchQuery('');
+  setCurrentPage(1);
+
+  await loadImages(1); // force fresh metadata
+};
 
 
 

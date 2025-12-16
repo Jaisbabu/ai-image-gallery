@@ -33,10 +33,9 @@ const ImageUpload = ({ onUploadComplete }) => {
 
       if (result.success) {
         toast.success(result.message);
-        setTimeout(() => {
-          setUploadProgress([]);
-          onUploadComplete?.();
-        }, 3000);
+        setUploadProgress([]);
+onUploadComplete?.(); // trigger immediate reload & polling
+
       } else {
         toast.error('Some uploads failed');
       }
