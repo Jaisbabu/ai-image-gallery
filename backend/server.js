@@ -13,6 +13,9 @@ const searchRoutes = require('./routes/search');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// ✅ REQUIRED for Railway / reverse proxies
+app.set('trust proxy', 1);
+
 /* -------------------- SECURITY (FIXED CSP) -------------------- */
 app.use(
   helmet({
