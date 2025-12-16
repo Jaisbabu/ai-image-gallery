@@ -1,213 +1,150 @@
-AI Image Gallery
+# AI Image Gallery
 
-(Vite + React + Node.js + Docker)
+An AI-powered image gallery that allows users to upload images, receive automatic AI-generated metadata, and search their personal image collection using text, colors, or visual similarity.
 
-An AI-powered image gallery that analyzes uploaded images and enables smart search, color filtering, and visual similarity discovery.
+Built with **React + Vite** on the frontend and **Node.js + Express** on the backend, using **Supabase** for authentication, database, and storage.
 
-The project uses React + Vite on the frontend and Node.js + Express on the backend, with Supabase for authentication, database, and storage.
-All services are designed to run locally via Docker for consistent development.
+---
 
-🌟 Key Features
-🔐 User Authentication
+## ✨ Core Features
 
-Email/password authentication using Supabase Auth
+### 🔐 Authentication
+- Email/password authentication using Supabase Auth
+- Secure, user-isolated data access via Row Level Security (RLS)
+- Each user can only access their own images and metadata
 
-Each user can access only their own images
+### 📤 Image Upload
+- Drag & drop or file picker
+- Supports JPEG, PNG, and WebP formats
+- Stores:
+  - Original image
+  - Generated thumbnail (300×300)
+- Uploads are non-blocking
+- AI analysis runs asynchronously in the background
 
-Enforced using Row Level Security (RLS)
-
-📤 Image Upload
-
-Drag & drop or file picker
-
-Supports JPEG, PNG, WebP
-
-Stores:
-
-Original image
-
-Generated thumbnail (300×300)
-
-Uploads are non-blocking
-
-AI analysis runs asynchronously
-
-🤖 AI Image Analysis
-
-Each image is processed once and cached.
+### 🤖 AI Image Analysis
+Each image is processed **once** and cached.
 
 AI generates:
+- 5–10 semantic tags
+- One descriptive sentence
+- Top 3 dominant colors
+- Processing status (`pending`, `processing`, `completed`)
 
-5–10 semantic tags
+All AI metadata is stored and reused for:
+- Search
+- Filtering
+- Similarity matching
 
-One-sentence description
+➡️ **No repeated AI calls** → faster performance and lower cost.
 
-Dominant colors (top 3)
+---
 
-Processing status (pending, processing, completed)
+## 🔍 Search & Discovery
 
-AI metadata is stored in the database and reused for:
+Supported search modes:
+- **Text search** (tags + description)
+- **Color-based filtering**
+- **Find similar images** (metadata-based similarity)
 
-Search
+### Search Behavior (Intentional Design)
+- Search is **state-driven**, not triggered on every keystroke
+- Queries shorter than 2 characters are ignored
+- Empty queries reset the gallery
+- Requests are cancelled using `AbortController`
+- Pagination works across all search modes
 
-Filtering
+This design avoids unnecessary API calls while keeping the UI responsive.
 
-Similarity matching
+---
 
-➡️ No repeated AI calls → faster & cheaper
+## 🖼️ Image Viewer
+- Full-size image preview (modal)
+- Keyboard navigation (← → Esc)
+- Next / Previous navigation
+- Download image
+- Delete image
+- Find similar images
+- Color-based filtering
+- Editable tags (bonus feature)
 
-🔍 Search & Discovery
+---
 
-Supported modes:
+## 📱 UI & UX
+- Responsive grid layout
+- Optimized for desktop and mobile
+- Clean, minimal, professional interface
+- Skeleton loaders and clear empty states
 
-Text search (tags + description)
+---
 
-Color-based filtering
+## 🏗️ Tech Stack
 
-Find similar images (metadata-based)
+### Frontend
+- React 18
+- Vite
+- Tailwind CSS
+- Lucide React
 
-Search Behavior (Intentional Design)
+### Backend
+- Node.js
+- Express.js
+- Multer (uploads)
+- Sharp (image processing)
 
-Search is state-driven, not triggered on every keystroke
+### Database & Storage
+- Supabase (PostgreSQL)
+- Supabase Storage
+- Row Level Security (RLS)
 
-Queries shorter than 2 characters are ignored
+### AI Service
+- Google Vision API
+  - Image labeling
+  - Description generation
+  - Color extraction
 
-Empty queries reset the gallery
+---
 
-Requests are cancelled using AbortController
+## 🧠 AI Design Decisions
 
-Pagination works across all search modes
-
-This avoids unnecessary API calls while keeping the UI responsive.
-
-🖼️ Image Viewer (Modal)
-
-Full-size image preview
-
-Keyboard navigation (← → Esc)
-
-Next / Previous navigation
-
-Download image
-
-Delete image
-
-Find similar images
-
-Color-based filtering
-
-Editable tags (bonus feature)
-
-📱 Responsive UI
-
-Grid-based layout
-
-Optimized for desktop & mobile
-
-Clean, minimal, professional design
-
-🏗️ Tech Stack
-Frontend
-
-React 18
-
-Vite
-
-Tailwind CSS
-
-Lucide React
-
-React Dropzone
-
-Backend
-
-Node.js
-
-Express.js
-
-Multer (uploads)
-
-Sharp (image processing)
-
-Database & Storage
-
-Supabase (PostgreSQL)
-
-Supabase Storage
-
-Row Level Security (RLS)
-
-AI Service
-
-Google Vision API
-
-Image labeling
-
-Description generation
-
-Color extraction
-
-Infrastructure
-
-Docker
-
-Docker Compose
-
-🧠 AI Design Decisions
-Why Google Vision AI?
-
+### Why Google Vision API?
 Chosen for:
+- High accuracy on real-world images
+- Simple REST-based integration
+- Generous free tier for prototyping
 
-High accuracy on real-world images
+Alternatives considered:
+- AWS Rekognition (higher cost)
+- Azure Vision (more complex setup)
 
-Simple REST API
+### Metadata Caching Strategy
+- AI runs once per image
+- Metadata is stored permanently
+- All discovery features use cached data
+- No repeated AI calls
 
-Generous free tier for prototyping
+---
 
-Trade-offs:
+## 🚀 Running the Project (Docker)
 
-Vendor lock-in
+### Prerequisites
+- Docker
+- Docker Compose
+- Supabase project
+- Google Cloud Vision API enabled
 
-Cost per request at scale
-
-AI Metadata Caching
-
-AI runs once per image
-
-Metadata is stored permanently
-
-All discovery features use cached data
-
-No repeated AI calls
-
-🚀 Getting Started (Docker)
-Prerequisites
-
-Docker
-
-Docker Compose
-
-Supabase account
-
-Google Cloud Vision API enabled
-
-Start the Application
+## 🚀 Running the Project (Docker)
+```bash
 docker compose up --build
 
-
-This starts:
-
-Frontend (Vite)
-
-Backend (Express API)
-
-Any required background services
+Services:
 
 Frontend: http://localhost:3000
 
 Backend: http://localhost:3001
 
-📂 Project Structure
+## 📂 Project Structure
+
 ai-image-gallery/
 ├── backend/
 │   ├── routes/
@@ -228,30 +165,16 @@ ai-image-gallery/
 │   ├── ARCHITECTURE.md
 │   └── database_setup.sql
 
-🧪 Development Notes
 
-AI processing is asynchronous
 
-Search relies exclusively on stored metadata
+## 🔮 Future Improvements
 
-Pagination is applied for performance
+- Albums / collections
+- Batch operations
+- Advanced similarity scoring
+- Image editing (crop, rotate)
+- Background job monitoring dashboard
 
-AbortController prevents stale responses
-
-Vite provides instant HMR and fast builds
-
-🔮 Future Improvements
-
-Albums / collections
-
-Batch operations
-
-Advanced similarity scoring
-
-Image editing (crop, rotate)
-
-Background job monitoring dashboard
-
-📄 License
+## 📄 License
 
 MIT License
