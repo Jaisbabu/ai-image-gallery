@@ -11,7 +11,12 @@ const imageProcessingQueue = new Queue('image-processing', REDIS_URL);
 console.log('🧠 AI Worker started and listening for jobs...');
 
 imageProcessingQueue.process(1, async (job) => {
-  const { imageId, filePath } = job.data;
+  const { imageId, imageUrl } = job.data;
+
+// const res = await fetch(imageUrl);
+// if (!res.ok) throw new Error('Failed to fetch image');
+// const imageBuffer = Buffer.from(await res.arrayBuffer());
+
 
   console.log(`🔄 Processing image ${imageId}`);
 
@@ -22,11 +27,13 @@ imageProcessingQueue.process(1, async (job) => {
       .update({ ai_processing_status: 'processing' })
       .eq('image_id', imageId);
 
-    // 2️⃣ Download image
-    const imageBuffer = await storageService.downloadFile(filePath);
-    if (!imageBuffer) {
-      throw new Error('Failed to download image from storage');
-    }
+    
+    // 2️⃣ Download image via URL
+const imageBuffer = await storageService.downloadFromUrl(imageUrl);
+if (!imageBuffer) {
+  throw new Error('Failed to download image from URL');
+}
+
 
     // 3️⃣ Run Vision AI
     const analysis = await visionAI.analyzeImage(imageBuffer);
