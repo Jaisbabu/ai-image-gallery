@@ -11,7 +11,7 @@ class VisionAIService {
       credentials
     });
   }
-}
+
   // constructor() {
   //   // Initialize the client
   //   this.client = new vision.ImageAnnotatorClient({
