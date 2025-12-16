@@ -1,12 +1,23 @@
 const vision = require('@google-cloud/vision');
 
 class VisionAIService {
+  
   constructor() {
-    // Initialize the client
+    const credentials = JSON.parse(
+      process.env.GOOGLE_APPLICATION_CREDENTIALS
+    );
+
     this.client = new vision.ImageAnnotatorClient({
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+      credentials
     });
   }
+}
+  // constructor() {
+  //   // Initialize the client
+  //   this.client = new vision.ImageAnnotatorClient({
+  //     keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+  //   });
+  // }
 
   /**
    * Analyze an image and extract tags, description, and colors
