@@ -27,7 +27,7 @@ app.use(
           "blob:",
           "https://*.supabase.co"
         ],
-        connectSrc: [
+       connectSrc: [
   "'self'",
   "https://*.railway.app",
   "https://*.up.railway.app",
@@ -93,4 +93,3 @@ app.use((err, req, res, next) => {
 })();
 
 module.exports = app;
-
