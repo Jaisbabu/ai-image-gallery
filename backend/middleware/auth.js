@@ -19,7 +19,7 @@ async function authenticateUser(req, res, next) {
     const supabase = createUserClient(token);
 
     // Verify token by getting user
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
       return res.status(401).json({
