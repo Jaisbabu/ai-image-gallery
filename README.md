@@ -122,7 +122,7 @@ Alternatives considered:
 
 ---
 
-## 🚀 Local Development (Optional)
+## 🚀 Local Development 
 
 > The live demo is fully deployed and does not require local setup for review.
 
