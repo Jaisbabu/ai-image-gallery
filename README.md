@@ -6,6 +6,14 @@ Built with **React + Vite** on the frontend and **Node.js + Express** on the bac
 
 ---
 
+## 🔗 Live Demo
+https://ai-image-gallery-git-main-jais-projects-cc8ec777.vercel.app/login
+
+## 🎥 Demo Video
+https://drive.google.com/file/d/1Lrh-WlERJIhYdYgg2IcY00CupgcjlvFm/view
+
+---
+
 ## ✨ Core Features
 
 ### 🔐 Authentication
@@ -25,13 +33,13 @@ Built with **React + Vite** on the frontend and **Node.js + Express** on the bac
 ### 🤖 AI Image Analysis
 Each image is processed **once** and cached.
 
-AI generates:
+Generated metadata:
 - 5–10 semantic tags
 - One descriptive sentence
 - Top 3 dominant colors
 - Processing status (`pending`, `processing`, `completed`)
 
-All AI metadata is stored and reused for:
+Cached metadata is reused for:
 - Search
 - Filtering
 - Similarity matching
@@ -41,20 +49,12 @@ All AI metadata is stored and reused for:
 ---
 
 ## 🔍 Search & Discovery
+- Text search (tags + description)
+- Color-based filtering
+- Find similar images using metadata similarity
+- Pagination supported across all search modes
 
-Supported search modes:
-- **Text search** (tags + description)
-- **Color-based filtering**
-- **Find similar images** (metadata-based similarity)
-
-### Search Behavior (Intentional Design)
-- Search is **state-driven**, not triggered on every keystroke
-- Queries shorter than 2 characters are ignored
-- Empty queries reset the gallery
-- Requests are cancelled using `AbortController`
-- Pagination works across all search modes
-
-This design avoids unnecessary API calls while keeping the UI responsive.
+Search is optimized to avoid unnecessary API calls while keeping the UI responsive.
 
 ---
 
@@ -66,7 +66,6 @@ This design avoids unnecessary API calls while keeping the UI responsive.
 - Delete image
 - Find similar images
 - Color-based filtering
-- Editable tags (bonus feature)
 
 ---
 
@@ -81,16 +80,14 @@ This design avoids unnecessary API calls while keeping the UI responsive.
 ## 🏗️ Tech Stack
 
 ### Frontend
-- React 18
-- Vite
+- React + Vite
 - Tailwind CSS
-- Lucide React
 
 ### Backend
 - Node.js
 - Express.js
-- Multer (uploads)
-- Sharp (image processing)
+- Multer
+- Sharp
 
 ### Database & Storage
 - Supabase (PostgreSQL)
@@ -109,9 +106,9 @@ This design avoids unnecessary API calls while keeping the UI responsive.
 
 ### Why Google Vision API?
 Chosen for:
-- High accuracy on real-world images
+- Strong accuracy on real-world images
 - Simple REST-based integration
-- Generous free tier for prototyping
+- Cost efficiency with a generous free tier
 
 Alternatives considered:
 - AWS Rekognition (higher cost)
@@ -119,13 +116,15 @@ Alternatives considered:
 
 ### Metadata Caching Strategy
 - AI runs once per image
-- Metadata is stored permanently
+- Metadata stored permanently
 - All discovery features use cached data
 - No repeated AI calls
 
 ---
 
-## 🚀 Running the Project (Docker)
+## 🚀 Local Development (Optional)
+
+> The live demo is fully deployed and does not require local setup for review.
 
 ### Prerequisites
 - Docker
@@ -133,7 +132,6 @@ Alternatives considered:
 - Supabase project
 - Google Cloud Vision API enabled
 
-## 🚀 Running the Project (Docker)
 ```bash
 docker compose up --build
 
@@ -150,6 +148,7 @@ ai-image-gallery/
 │   ├── routes/
 │   ├── services/
 │   ├── middleware/
+│   ├── worker.js
 │   └── server.js
 │
 ├── frontend/
