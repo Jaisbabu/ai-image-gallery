@@ -45,38 +45,12 @@ app.use(
   })
 );
 
-/* -------------------- CORS -------------------- */
-
-  const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'https://ai-image-gallery-sigma.vercel.app'
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (Postman, server-to-server)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error('Not allowed by CORS'));
-    },
+    origin: process.env.FRONTEND_URL,
     credentials: true
   })
 );
-
-
-
-// app.use(
-//   cors({
-//     origin: process.env.FRONTEND_URL || 'https://ai-image-gallery-sigma.vercel.app',
-//     credentials: true
-//   })
-// );
 
 /* -------------------- BODY PARSING -------------------- */
 app.use(express.json());
