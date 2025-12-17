@@ -26,7 +26,6 @@ const ImageModal = ({
   onTagsUpdated
 }) => {
   const [image, setImage] = useState(initialImage);
-  const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   // 🔹 Tag editing state (NEW)
@@ -64,28 +63,21 @@ const ImageModal = ({
 
   // fetch full image if needed (OLD + NEW)
   useEffect(() => {
-    const fetchDetails = async () => {
-      if (skipNextFetchRef.current) {
-        skipNextFetchRef.current = false;
-        return;
-      }
+  const fetchDetails = async () =>{
 
-      if (!image.originalUrl) {
-        setLoading(true);
-        try {
-          const result = await api.getImage(image.id);
-          setImage(result.image);
-          setEditedTags(result.image.metadata?.tags || []);
-        } catch {
-          toast.error('Failed to load image details');
-        } finally {
-          setLoading(false);
-        }
+    if (!image.originalUrl) {
+      try {
+        const result = await api.getImage(image.id);
+        setImage(result.image);
+        setEditedTags(result.image.metadata?.tags || []);
+      } catch {
+        toast.error('Failed to load image details');
       }
-    };
+    }
+  };
 
-    fetchDetails();
-  }, [image.id, image.originalUrl]);
+  fetchDetails();
+}, [image.id, image.originalUrl]);
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this image?')) return;
@@ -160,8 +152,6 @@ const ImageModal = ({
 
     const result = await api.updateImageTags(image.id, tagsToSave);
 
-    skipNextFetchRef.current = true;
-
     setImage(prev => ({
       ...prev,
       metadata: {
@@ -185,13 +175,22 @@ const ImageModal = ({
   }
 };
 
-
-
-
   const metadata = image.metadata;
   const isProcessing =
     metadata?.ai_processing_status === 'pending' ||
     metadata?.ai_processing_status === 'processing';
+
+    const aiStatusText = (status) => {
+  switch (status) {
+    case 'pending':
+      return 'Queued for AI analysis…';
+    case 'processing':
+      return 'Analyzing image with AI…';
+    default:
+      return '';
+  }
+};
+
 
   return (
     <div
@@ -213,15 +212,30 @@ const ImageModal = ({
         <div className="flex flex-col md:flex-row h-full max-h-[90vh]">
           {/* IMAGE AREA */}
           <div className="relative flex-1 bg-black flex items-center justify-center p-8">
-            {loading ? (
-              <Loader className="w-12 h-12 text-purple-400 animate-spin" />
-            ) : (
-              <img
-                src={image.originalUrl || image.thumbnailUrl}
-                alt={image.filename}
-                className="max-w-full max-h-full object-contain"
-              />
-            )}
+
+
+          <img
+  src={image.originalUrl || image.thumbnailUrl}
+  alt={image.filename}
+  className={`max-w-full max-h-full object-contain transition-all duration-300 ${
+    isProcessing ? 'opacity-60 scale-[0.98]' : 'opacity-100'
+  }`}
+/>
+
+{isProcessing && (
+  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="flex flex-col items-center gap-3 px-6 py-4 bg-black/60 rounded-xl border border-white/10">
+      <Loader className="w-6 h-6 text-purple-400 animate-spin" />
+      <p className="text-sm text-purple-200 font-medium">
+  {aiStatusText(metadata?.ai_processing_status)}
+</p>
+<p className="text-xs text-white/60 text-center max-w-[220px]">
+  We’re analyzing this image to generate tags, description, and dominant colors.
+</p>
+
+    </div>
+  </div>
+)}    
 
             {hasPrev && (
               <button
@@ -271,16 +285,7 @@ const ImageModal = ({
               {image.filename}
             </h2>
 
-            {/* AI PROCESSING (OLD) */}
-            {isProcessing && (
-              <div className="mb-6 p-4 bg-purple-500/10 rounded-xl">
-                <div className="flex items-center gap-2 text-purple-300">
-                  <Loader className="w-4 h-4 animate-spin" />
-                  AI Analyzing…
-                </div>
-              </div>
-            )}
-
+            
             {/* AI DESCRIPTION (OLD) */}
             {metadata?.description && !isProcessing && (
               <div className="mb-6">
@@ -411,12 +416,19 @@ const ImageModal = ({
               </button>
 
               <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="bg-red-500/20 text-red-300 py-2 rounded"
-              >
-                {deleting ? 'Deleting…' : 'Delete Image'}
-              </button>
+  onClick={handleDelete}
+  disabled={deleting}
+  className="
+    flex items-center justify-center gap-2
+    bg-red-500/20 hover:bg-red-500/30
+    text-red-300 py-2 rounded
+    transition disabled:opacity-50
+  "
+>
+  <Trash2 className="w-4 h-4" />
+  {deleting ? 'Deleting…' : 'Delete Image'}
+</button>
+
             </div>
           </div>
         </div>
