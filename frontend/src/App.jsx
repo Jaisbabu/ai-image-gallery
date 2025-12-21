@@ -7,9 +7,7 @@ import Login from './pages/Login.jsx';
 import SignUp from './pages/SignUp.jsx';
 import Gallery from './pages/Gallery.jsx';
 
-console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0,20));
+
 
 function App() {
   return (
